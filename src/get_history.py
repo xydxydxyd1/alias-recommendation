@@ -1,7 +1,7 @@
 import os
 import re
 
-def get_history_commands():
+def get_history():
     bash_history_path = os.path.expanduser("~/.bash_history")
     zsh_history_path = os.path.expanduser("~/.zsh_history")
     commands = []
@@ -19,5 +19,4 @@ def get_history_commands():
     return commands
 
 if __name__ == "__main__":
-    print(get_history_commands())
-
+    print(get_history())
