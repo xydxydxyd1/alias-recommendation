@@ -45,18 +45,21 @@ def generate_alias(command, alias_len=4):
     command is returned without whitespace.
     """
     words = command.split()
-    # A list of integers representing the head of each word taken in the command
-    # to be composed into an alias
-    word_head_taken = [1]*len(words)
-    total_len = len(words)
-    while total_len < alias_len:
-        for i in range(len(words)):
-            if word_head_taken[i] < len(words):
-                word_head_taken[i] += 1
-                total_len += 1
-                if total_len >= alias_len:
-                    break
-    word_heads = [words[i][:word_head_taken[i]] for i in range(len(words))]
+    words = ["".join(filter(str.isalnum, word)) for word in words]
+
+    # List of beginning characters of each word to be used in the alias
+    word_heads = ["" for _ in range(len(words))]
+    current_alias_len = 0
+    out_of_characters = False
+    current_character_index = 0
+    while current_alias_len < alias_len and not out_of_characters:
+        out_of_characters = True
+        for word_index, word in enumerate(words):
+            if current_character_index < len(word):
+                out_of_characters = False
+                word_heads[word_index] += word[current_character_index]
+                current_alias_len += 1
+        current_character_index += 1
     return "".join(word_heads)
 
 
@@ -89,14 +92,15 @@ def get_best_aliases_from_history(history_commands, num_aliases=5, alias_len=4):
         aliases[command] = alias
     return aliases
 
+
 if __name__ == "__main__":
     print("Getting history commands")
     history_commands = get_history()
 
-    #aliases = get_best_aliases_from_history(history_commands)
-    #pprint.pprint(aliases)
+    aliases = get_best_aliases_from_history(history_commands)
+    pprint.pprint(aliases)
 
-    head_map = get_head_freqs(history_commands)
-    head_rating = rate_heads(head_map)
-    best_heads = get_highest_rated_heads(head_rating)
-    pprint.pprint(best_heads)
+    # head_map = get_head_freqs(history_commands)
+    # head_rating = rate_heads(head_map)
+    # best_heads = get_highest_rated_heads(head_rating)
+    # pprint.pprint(best_heads)
