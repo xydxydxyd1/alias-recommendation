@@ -1,6 +1,8 @@
 import pprint
+import logging
 from get_history import get_history
 
+logger = logging.getLogger(__name__)
 
 def get_head_freqs(history_commands, min_head_len=4):
     """Get a map of all heads and their frequencies, ignoring heads shorter than
@@ -23,7 +25,7 @@ def get_head_freqs(history_commands, min_head_len=4):
     return head_map
 
 
-def rate_heads(head_map):
+def rate_heads(head_map, alias_len=4):
     """Rate heads based on frequency*length
 
     This is the rating used for suggesting aliases: Longer heads and more
@@ -33,7 +35,7 @@ def rate_heads(head_map):
     head_rating = {}
 
     for head, freq in head_map.items():
-        head_rating[head] = freq * len(head)
+        head_rating[head] = freq * (len(head) - alias_len)
 
     return head_rating
 
@@ -76,14 +78,14 @@ def get_best_aliases_from_history(history_commands, num_aliases=5, alias_len=4):
     alias_len -- the length of the generated alias. If one cannot be generated,
     command is returned without whitespace.
     """
-    print("Getting head frequencies")
+    logger.info("Getting head frequencies")
     head_map = get_head_freqs(history_commands)
-    print("Rating heads")
-    head_rating = rate_heads(head_map)
-    print("Sorting heads by rating")
+    logger.info("Rating heads")
+    head_rating = rate_heads(head_map, alias_len)
+    logger.info("Sorting heads by rating")
     best_heads = sorted(
         head_rating, key=lambda x: head_rating[x], reverse=True)
-    print("Generating aliases")
+    logger.info("Generating aliases")
     aliases = {}
     for command in best_heads:
         if len(aliases) >= num_aliases:
@@ -94,7 +96,9 @@ def get_best_aliases_from_history(history_commands, num_aliases=5, alias_len=4):
 
 
 if __name__ == "__main__":
-    print("Getting history commands")
+    logging.basicConfig(filename="alias_generation.log", level=logging.DEBUG)
+
+    logger.info("Getting history commands")
     history_commands = get_history()
 
     aliases = get_best_aliases_from_history(history_commands)
