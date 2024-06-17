@@ -1,8 +1,10 @@
 import pprint
 import logging
 from get_history import get_history
+import argparse
 
 logger = logging.getLogger(__name__)
+
 
 def get_head_freqs(history_commands, min_head_len=4):
     """Get a map of all heads and their frequencies, ignoring heads shorter than
@@ -98,10 +100,17 @@ def get_best_aliases_from_history(history_commands, num_aliases=5, alias_len=4):
 if __name__ == "__main__":
     logging.basicConfig(filename="alias_generation.log", level=logging.DEBUG)
 
+    # Get arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--num_aliases", type=int, default=5)
+    parser.add_argument("--alias_len", type=int, default=2)
+    args = parser.parse_args()
+
     logger.info("Getting history commands")
     history_commands = get_history()
 
-    aliases = get_best_aliases_from_history(history_commands)
+    aliases = get_best_aliases_from_history(history_commands, args.num_aliases,
+                                            args.alias_len)
     pprint.pprint(aliases)
 
     # head_map = get_head_freqs(history_commands)
