@@ -1,15 +1,14 @@
 # Gets the current alias in use
-import os
 import re
 import logging
-import pprint
+import argparse
 
 logger = logging.getLogger(__name__)
 
 # First capture group is the alias name, second is the alias value
-alias_matcher = re.compile(r"^([a-zA-Z0-9_.-]+)=([']?)([^']*)'$")
+alias_matcher = re.compile(r"^([a-zA-Z0-9_.-]+)=[']?([^']*)'$")
 
-def get_current_alias(aliases):
+def process_alias_input(aliases):
     """Finds current aliases by executing `alias`
 
     Args:
@@ -33,3 +32,8 @@ def get_current_alias(aliases):
     return alias_names, alias_vals
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Get the current aliases in use")
+    parser.add_argument("aliases", type=str, help="The output of the `alias` command")
+    args = parser.parse_args()
+    aliases = process_alias_input(args.aliases)
+    print(aliases)
