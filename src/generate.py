@@ -15,28 +15,34 @@ def get_head_freqs(history_commands, min_head_len=4):
     head_map = {}
 
     for command in history_commands:
+        logger.debug(f"Processing command {command}")
         words = command.split()
         for i in range(1, len(words) + 1):
             head = " ".join(words[:i])
             if len(head) < min_head_len:
+                logger.debug(f"Skipping head {head} because it is too short")
                 continue
+            #logger.debug(f"Found head {head}")
             if head not in head_map:
                 head_map[head] = 1
             else:
                 head_map[head] += 1
+    logger.info(f"Found {len(head_map)} heads")
     return head_map
 
 
-def rate_heads(head_map, alias_len=4):
+def rate_heads(head_freqs, alias_len=4):
     """Rate heads based on frequency*length
 
     This is the rating used for suggesting aliases: Longer heads and more
     frequently used heads are rated higher. The higher the rating, the better
     the alias.
+
+    Returns a map of heads to their ratings
     """
     head_rating = {}
 
-    for head, freq in head_map.items():
+    for head, freq in head_freqs.items():
         head_rating[head] = freq * (len(head) - alias_len)
 
     return head_rating
@@ -63,6 +69,8 @@ def generate_alias(command, alias_len=4):
                 out_of_characters = False
                 word_heads[word_index] += word[current_character_index]
                 current_alias_len += 1
+                if current_alias_len >= alias_len:
+                    break
         current_character_index += 1
     return "".join(word_heads)
 
@@ -74,7 +82,7 @@ def get_highest_rated_heads(head_ratings, num_heads=5):
     return best_heads[:num_heads]
 
 
-def get_best_aliases_from_history(history_commands, num_aliases=5, alias_len=4):
+def get_best_aliases(history_commands, num_aliases=5, alias_len=4):
     """Get a map of all commands and their suggested aliases
 
     alias_len -- the length of the generated alias. If one cannot be generated,
@@ -96,10 +104,7 @@ def get_best_aliases_from_history(history_commands, num_aliases=5, alias_len=4):
         aliases[command] = alias
     return aliases
 
-
 if __name__ == "__main__":
-    logging.basicConfig(filename="alias_generation.log", level=logging.DEBUG)
-
     # Get arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_aliases", type=int, default=5)
@@ -109,8 +114,8 @@ if __name__ == "__main__":
     logger.info("Getting history commands")
     history_commands = get_history()
 
-    aliases = get_best_aliases_from_history(history_commands, args.num_aliases,
-                                            args.alias_len)
+    aliases = get_best_aliases(history_commands, args.num_aliases,
+                               args.alias_len)
     pprint.pprint(aliases)
 
     # head_map = get_head_freqs(history_commands)
