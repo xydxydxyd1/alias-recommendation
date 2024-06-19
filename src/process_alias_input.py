@@ -6,7 +6,7 @@ import argparse
 logger = logging.getLogger(__name__)
 
 # First capture group is the alias name, second is the alias value
-alias_matcher = re.compile(r"^([a-zA-Z0-9_.-]+)=[']?([^']*)'$")
+alias_matcher = re.compile(r"^([a-zA-Z0-9_.-]+)='?([^']*)'?$")
 
 def process_alias_input(aliases):
     """Finds current aliases by executing `alias`
@@ -27,8 +27,10 @@ def process_alias_input(aliases):
         if match:
             alias_names.add(match.group(1))
             alias_vals.add(match.group(2))
+        else:
+            logger.warn(f"Could not parse alias: {alias}")
 
-    logger.info(f"Found number of aliases: {len(alias_names)}")
+    logger.info(f"Found {len(alias_names)} aliases")
     return alias_names, alias_vals
 
 if __name__ == "__main__":

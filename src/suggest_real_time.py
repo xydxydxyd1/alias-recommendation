@@ -1,4 +1,4 @@
-# See if there is any highly-rated alias. If yes, suggest it real time.
+# See if there is any highly-rated alias. If yes, print out the suggestion
 import argparse
 from generate import generate_alias, get_head_freqs, rate_heads
 from process_alias_input import process_alias_input
@@ -6,6 +6,7 @@ import logging
 import pprint
 
 logger = logging.getLogger(__name__)
+
 
 def parse_arguments():
     """Parse inputs for the suggest_real_time.py script.
@@ -19,12 +20,13 @@ def parse_arguments():
     parser.add_argument('history', type=str,
                         help='The history of commands considered for alias')
     parser.add_argument('existing_aliases', type=str,
-                        help='The output of the `alias` command')
+                        help='The output of the `alias` command. If a command already has an alias, it will not be suggested. If a suggested alias name already exists, a new alias name would be generated.')
     parser.add_argument('--alias_len', type=int, default=3)
     args = parser.parse_args()
     logger.info(f"Ran with history of length {len(args.history)}")
     logger.info(f"Ran with alias length {args.alias_len}")
-    logger.info(f"Ran with existing aliases of length {len(args.existing_aliases)}")
+    logger.info(f"Ran with existing aliases of length {
+                len(args.existing_aliases)}")
     return args.history, args.existing_aliases, args.alias_len
 
 
@@ -38,27 +40,38 @@ def find_best_alias(head_ratings, existing_aliases, alias_len):
     best_heads = sorted(
         head_ratings, key=lambda x: head_ratings[x], reverse=True)
     for head in best_heads:
-        if head in existing_aliases[0]:
-            logging.info(f"Head {head} already has an alias")
+        if head in existing_aliases[1]:
+            logger.info(f"Head {head} already has an alias. Skipping it")
             continue
         alias = generate_alias(head, alias_len)
         logger.debug(f"Generated alias {alias} for head {head}")
-        if alias in existing_aliases[1]:
+        if alias in existing_aliases[0]:
             logging.info(f"Alias {alias} already exists. Generating a new one")
             alias = generate_alias(head, alias_len + 1)
         return (alias, head, head_ratings[head])
     return None
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+def recommend_alias(history, existing_aliases, alias_len, min_rating):
+    """Recommend a a good alias. Returns None if no good alias are found"""
+    head_ratings = rate_heads(get_head_freqs(history), alias_len)
+    best_alias = find_best_alias(head_ratings, existing_aliases, alias_len)
+    if best_alias is None or best_alias[2] < min_rating:
+        logger.info("No good alias found")
+        return None
 
+    # Format output
+    return f"alias {best_alias[0]}='{best_alias[1]}'"
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.WARNING)
+
+    logger.info("Parsing arguments")
     history, existing_aliases, alias_len = parse_arguments()
     existing_aliases = process_alias_input(existing_aliases)
     history = history.split("\n")
-    logging.info(f"Got history of length {len(history)}")
 
-    head_freqs = get_head_freqs(history)
-    head_ratings = rate_heads(get_head_freqs(history), alias_len)
-    best_alias = find_best_alias(head_ratings, existing_aliases, alias_len)
-    pprint.pprint(best_alias);
+    logger.info("Recommending alias")
+    recommended_alias = recommend_alias(history, existing_aliases, alias_len,
+                                        50)
+    print(recommended_alias)
