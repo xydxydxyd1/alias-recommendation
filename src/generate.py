@@ -31,7 +31,7 @@ def get_head_freqs(history_commands, min_head_len=4):
     return head_map
 
 
-def rate_heads(head_freqs, alias_len=4):
+def rate_heads(head_freqs, alias_len=4, ignored_cmds=None):
     """Rate heads based on frequency*length
 
     This is the rating used for suggesting aliases: Longer heads and more
@@ -43,6 +43,9 @@ def rate_heads(head_freqs, alias_len=4):
     head_rating = {}
 
     for head, freq in head_freqs.items():
+        if ignored_cmds and head in ignored_cmds:
+            logger.debug(f"Skipping head {head} because it is in ignored_cmds")
+            continue
         head_rating[head] = freq * (len(head) - alias_len)
 
     return head_rating

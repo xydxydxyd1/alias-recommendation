@@ -1,8 +1,7 @@
 # preexec ZSH hook for suggesting aliases
 
 suggest_alias() {
-    suggest_cmd='python3 ./suggest_real_time.py "$(history | cut -c 8-)" "$(alias)
-$IGNORED_ALIAS"'
+    suggest_cmd='python3 ./suggest_real_time.py "$(history | cut -c 8-)" "$(alias)" --ignored_cmds "$IGNORED_ALIAS"'
     suggested_alias_cmd=$(eval $suggest_cmd)
     matcher="^alias ([a-zA-Z0-9_]+)='(.*)'$"
     if [[ "$suggested_alias_cmd" =~ $matcher ]]; then
@@ -12,7 +11,7 @@ $IGNORED_ALIAS"'
         read "yn?Do you want to create this alias? [y/n]"
         if ! [[ "$yn" =~ ^[Yy]$ ]]; then
             echo 'Alias not created and will not be suggested again.'
-            export IGNORED_ALIAS="$alias_name='$alias_value'\n$IGNORED_ALIAS"
+            export IGNORED_ALIAS="$alias_value\n$IGNORED_ALIAS"
             return
         fi
         echo "Creating alias $alias_name='$alias_value'"
