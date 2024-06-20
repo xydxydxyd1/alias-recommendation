@@ -3,10 +3,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "alias-recommendation_xydxydxyd"
+name = "alias_recommendation_xydxydxyd"
 version = "0.0.1"
 authors = [
-  { name="Eric Xu", email="yundi.eric.xu@gmail.com" },
+  { name="Eric Xu", email="xydxydxyd1@gmail.com" },
 ]
 description = "Suggests aliases for commonly used commands in your daily use"
 readme = "README.md"
@@ -22,4 +22,4 @@ Homepage = "https://github.com/xydxydxyd1/alias-recommendation"
 Issues = "https://github.com/xydxydxyd1/alias-recommendation/issues"
 
 [project.scripts]
-suggest-alias = "alias-recommendation_xydxydxyd:main"
+suggest-alias = "alias-recommendation_xydxydxyd:suggest_real_time"
