@@ -33,9 +33,9 @@ def process_alias_input(aliases):
     logger.info(f"Found {len(alias_names)} aliases")
     return alias_names, alias_vals
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Get the current aliases in use")
-    parser.add_argument("aliases", type=str, help="The output of the `alias` command")
-    args = parser.parse_args()
-    aliases = process_alias_input(args.aliases)
-    print(aliases)
+#if __name__ == "__main__":
+#    parser = argparse.ArgumentParser(description="Get the current aliases in use")
+#    parser.add_argument("aliases", type=str, help="The output of the `alias` command")
+#    args = parser.parse_args()
+#    aliases = process_alias_input(args.aliases)
+#    print(aliases)

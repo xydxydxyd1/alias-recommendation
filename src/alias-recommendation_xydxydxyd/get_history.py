@@ -23,5 +23,5 @@ def get_history():
     return [command.strip() for command in commands]
 
 
-if __name__ == "__main__":
-    print(get_history())
+#if __name__ == "__main__":
+#    print(get_history())
