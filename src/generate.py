@@ -46,7 +46,8 @@ def rate_heads(head_freqs, alias_len=4, ignored_cmds=None):
         if ignored_cmds and head in ignored_cmds:
             logger.debug(f"Skipping head {head} because it is in ignored_cmds")
             continue
-        head_rating[head] = freq * (len(head) - alias_len)
+        # The -2 is to give a penalty to longer but infrequent heads
+        head_rating[head] = (freq - 2) * (len(head) - alias_len)
 
     return head_rating
 

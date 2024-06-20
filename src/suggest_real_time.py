@@ -7,6 +7,7 @@ import pprint
 
 logger = logging.getLogger(__name__)
 
+MIN_RATING=100
 
 def parse_arguments():
     """Parse inputs for the suggest_real_time.py script.
@@ -87,5 +88,5 @@ if __name__ == "__main__":
 
     logger.info("Recommending alias")
     recommended_alias = recommend_alias(history, existing_aliases, alias_len,
-                                        50, ignored_cmds)
+                                        MIN_RATING, ignored_cmds)
     print(recommended_alias)
