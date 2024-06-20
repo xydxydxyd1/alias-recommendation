@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "alias-recommendation_xydxydxyd"
 version = "0.0.1"
@@ -16,3 +20,6 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/xydxydxyd1/alias-recommendation"
 Issues = "https://github.com/xydxydxyd1/alias-recommendation/issues"
+
+[project.scripts]
+suggest-alias = "alias-recommendation_xydxydxyd:main"
