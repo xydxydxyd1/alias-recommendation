@@ -1,10 +1,10 @@
 [project]
-name = "./src/"
+name = "alias-recommendation_xydxydxyd"
 version = "0.0.1"
 authors = [
-  { name="Example Author", email="author@example.com" },
+  { name="Eric Xu", email="yundi.eric.xu@gmail.com" },
 ]
-description = "A small example package"
+description = "Suggests aliases for commonly used commands in your daily use"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -14,5 +14,5 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/pypa/sampleproject"
-Issues = "https://github.com/pypa/sampleproject/issues"
+Homepage = "https://github.com/xydxydxyd1/alias-recommendation"
+Issues = "https://github.com/xydxydxyd1/alias-recommendation/issues"
