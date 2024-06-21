@@ -2,6 +2,7 @@ import pprint
 import logging
 from get_history import get_history
 import argparse
+import shlex
 
 logger = logging.getLogger(__name__)
 
@@ -15,10 +16,10 @@ def get_head_freqs(history_commands, min_head_len=4):
     head_map = {}
 
     for command in history_commands:
-        logger.debug(f"Processing command {command}")
-        words = command.split()
+        words = shlex.split(command)
         for i in range(1, len(words) + 1):
-            head = " ".join(words[:i])
+            head = shlex.join(words[:i])
+            logger.debug(f"Processing head {head}")
             if len(head) < min_head_len:
                 logger.debug(f"Skipping head {head} because it is too short")
                 continue

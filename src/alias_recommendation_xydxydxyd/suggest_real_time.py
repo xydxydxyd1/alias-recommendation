@@ -70,7 +70,7 @@ def recommend_alias(history, existing_aliases, alias_len, min_rating, ignored_cm
 
 
 if __name__ == "__main__":
-    logging.basicConfig(filename="suggest_real_time.log", level=logging.DEBUG)
+    logging.basicConfig(filename="suggest_real_time.log", level=logging.INFO)
 
     logger.info("Parsing arguments")
     history, existing_aliases, alias_len, ignored_cmds = parse_arguments()

@@ -16,7 +16,10 @@ suggest_alias() {
         fi
         echo "Creating alias $alias_name='$alias_value'"
         eval $suggested_alias_cmd
-    else
-        echo "No good alias found."
+    #else
+    #    echo "No good alias found."
     fi
 }
+
+autoload -U add-zsh-hook
+add-zsh-hook preexec suggest_alias
