@@ -21,5 +21,6 @@ suggest_alias() {
     fi
 }
 
+# Add function to ZSH hook
 autoload -U add-zsh-hook
 add-zsh-hook preexec suggest_alias
