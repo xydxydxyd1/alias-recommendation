@@ -22,9 +22,6 @@ def get_history():
         with open(zsh_history_path, "r") as zsh_history:
             commands.extend(zsh_history.readlines())
 
-    # Escape all commands
-    commands = [cmd.replace("'", "\\'") for cmd in commands]
-
     return [command.strip() for command in commands]
 
 

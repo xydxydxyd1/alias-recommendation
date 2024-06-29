@@ -1,7 +1,9 @@
 # preexec ZSH hook for suggesting aliases
 
+rm ./suggest_real_time.log
+
 suggest_alias() {
-    local suggest_cmd='python3 ./suggest_real_time.py "$(history "-50" | cut -c 8-)" "$(alias)" --ignored_cmds "$IGNORED_ALIAS"'
+    local suggest_cmd='python3 ./suggest_real_time.py "$(history "-10" | cut -c 8-)" "$(alias)" --ignored_cmds "$IGNORED_ALIAS" --min_rating 25'
     local suggested_alias_cmd=$(eval $suggest_cmd)
     local matcher="^alias ([a-zA-Z0-9_]+)=\\$'(.*)'$"
     if [[ "$suggested_alias_cmd" =~ $matcher ]]; then
@@ -14,7 +16,7 @@ suggest_alias() {
             export IGNORED_ALIAS="$alias_value\n$IGNORED_ALIAS"
             return
         fi
-        echo "Creating alias $alias_name='$alias_value'"
+        echo "Creating $suggested_alias_cmd"
         eval $suggested_alias_cmd
     else
         echo "No good alias found."

@@ -7,8 +7,6 @@ import pprint
 
 logger = logging.getLogger(__name__)
 
-MIN_RATING = 100
-
 
 def parse_arguments():
     """Parse inputs for the suggest_real_time.py script.
@@ -26,6 +24,7 @@ def parse_arguments():
     parser.add_argument('--ignored_cmds', type=str, default="",
                         help='A newline-delimited list of all commands to never make aliases for.')
     parser.add_argument('--alias_len', type=int, default=3)
+    parser.add_argument('--min_rating', type=int, default=100)
     args = parser.parse_args()
     logger.info(f"Ran with history of length {len(args.history)}")
     logger.info(f"Ran with alias length {args.alias_len}")
@@ -33,7 +32,7 @@ def parse_arguments():
                 len(args.existing_aliases)}")
     logger.info(f"Ran with ignored commands of length {
                 len(args.ignored_cmds)}")
-    return args.history, args.existing_aliases, args.alias_len, args.ignored_cmds
+    return args
 
 
 def find_best_alias(head_ratings, existing_aliases, alias_len):
@@ -43,7 +42,7 @@ def find_best_alias(head_ratings, existing_aliases, alias_len):
         head_ratings: dict -- The ratings of the heads
         existing_aliases: tuple(set, set) -- The existing aliases' key and value
     """
-    logger.debug(f"Got existing aliases {existing_aliases}")
+    logger.debug(f"find_best_alias: Got existing aliases {existing_aliases}")
     best_heads = sorted(
         head_ratings, key=lambda x: head_ratings[x], reverse=True)
     for head in best_heads:
@@ -76,20 +75,21 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, filename='suggest_real_time.log')
 
     logger.info("Parsing arguments")
-    history, existing_aliases, alias_len, ignored_cmds = parse_arguments()
-    existing_aliases = process_alias_input(existing_aliases)
-    history = history.split("\n")
-    ignored_cmds = ignored_cmds.split("\\n")
-    ignored_cmds = set(ignored_cmds)
+    args = parse_arguments()
+    args.existing_aliases = process_alias_input(args.existing_aliases)
+    args.history = args.history.split("\n")
+    args.ignored_cmds = args.ignored_cmds.split("\\n")
+    args.ignored_cmds = set(args.ignored_cmds)
 
     # Argument debug
     logger.debug("ARGUMENTS:")
-    logger.debug(f"Ignored commands: {pprint.pformat(ignored_cmds)}")
-    logger.debug(f"History: {pprint.pformat(history)}")
-    logger.debug(f"Existing aliases: {pprint.pformat(existing_aliases)}")
-    logger.debug(f"Alias length: {alias_len}")
+    logger.debug(f"Ignored commands: {pprint.pformat(args.ignored_cmds)}")
+    logger.debug(f"History: {pprint.pformat(args.history)}")
+    logger.debug(f"Existing aliases: {pprint.pformat(args.existing_aliases)}")
+    logger.debug(f"Alias length: {args.alias_len}")
 
     logger.info("Recommending alias")
-    recommended_alias = recommend_alias(history, existing_aliases, alias_len,
-                                        MIN_RATING, ignored_cmds)
+    recommended_alias = recommend_alias(args.history, args.existing_aliases,
+                                        args.alias_len, args.min_rating,
+                                        args.ignored_cmds)
     print(recommended_alias)

@@ -1,3 +1,4 @@
+import re
 import pprint
 import logging
 from get_history import get_history
@@ -7,24 +8,26 @@ import shlex
 logger = logging.getLogger(__name__)
 
 
+def split_command(command):
+    matcher = r'''(?:[^\s"']+|"[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*')+'''
+    return re.findall(matcher, command)
+
+
 def get_head_freqs(history_commands, min_head_len=4):
     """Get a map of all heads and their frequencies, ignoring heads shorter than
     min_head_len
 
     Heads are the first n words of a command, where n is any real number.
     """
+    logger.debug(f"get_head_freqs: Got {history_commands}")
     head_map = {}
 
     for command in history_commands:
-        words = []
-        try:
-            words = shlex.split(command)
-        except ValueError:
-            logger.debug(f"Skipping command {command} because it is invalid")
-            continue
-        logger.debug(f"Processing command {words}")
-        for i in range(1, len(words) + 1):
-            head = shlex.join(words[:i])
+        tokens = []
+        tokens = split_command(command)
+        logger.debug(f"Processing command {tokens}")
+        for i in range(1, len(tokens) + 1):
+            head = " ".join(tokens[:i])
             logger.debug(f"Processing head {head}")
             if len(head) < min_head_len:
                 logger.debug(f"Skipping head {head} because it is too short")
