@@ -47,9 +47,11 @@ def rate_heads(head_freqs, alias_len=4, ignored_cmds=None):
 
     Returns a map of heads to their ratings
     """
+    logger.debug(f"rate_heads: Ignored commands: {ignored_cmds}")
     head_rating = {}
 
     for head, freq in head_freqs.items():
+        logger.debug(f"Rating head {head}")
         if ignored_cmds and head in ignored_cmds:
             logger.debug(f"Skipping head {head} because it is in ignored_cmds")
             continue

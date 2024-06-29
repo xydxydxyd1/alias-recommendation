@@ -68,16 +68,12 @@ def recommend_alias(history, existing_aliases, alias_len, min_rating, ignored_cm
         return None
     logger.info(f"Recommending alias: {best_alias}")
 
-    # Escape best alias
-    best_alias = (best_alias[0], best_alias[1].replace("'", "\\'"))
-
     # Format output
     return f"alias {best_alias[0]}=$'{best_alias[1]}'"
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG,
-                        filename='suggest_real_time.log', filemode='w')
+    logging.basicConfig(level=logging.DEBUG, filename='suggest_real_time.log')
 
     logger.info("Parsing arguments")
     history, existing_aliases, alias_len, ignored_cmds = parse_arguments()

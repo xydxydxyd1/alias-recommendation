@@ -1,7 +1,9 @@
+# Get histories for alias purposes, escaping all single quotes
 import os
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 def get_history():
     bash_history_path = os.path.expanduser("~/.bash_history")
@@ -20,8 +22,11 @@ def get_history():
         with open(zsh_history_path, "r") as zsh_history:
             commands.extend(zsh_history.readlines())
 
+    # Escape all commands
+    commands = [cmd.replace("'", "\\'") for cmd in commands]
+
     return [command.strip() for command in commands]
 
 
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    print(get_history())
