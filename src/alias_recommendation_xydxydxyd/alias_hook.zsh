@@ -3,7 +3,7 @@
 suggest_alias() {
     local suggest_cmd='python3 ./suggest_real_time.py "$(history "-50" | cut -c 8-)" "$(alias)" --ignored_cmds "$IGNORED_ALIAS"'
     local suggested_alias_cmd=$(eval $suggest_cmd)
-    local matcher="^alias ([a-zA-Z0-9_]+)='(.*)'$"
+    local matcher="^alias ([a-zA-Z0-9_]+)=\$'(.*)'$"
     if [[ "$suggested_alias_cmd" =~ $matcher ]]; then
         local alias_name="${match[1]}"
         local alias_value="${match[2]}"
@@ -16,8 +16,9 @@ suggest_alias() {
         fi
         echo "Creating alias $alias_name='$alias_value'"
         eval $suggested_alias_cmd
-    #else
-    #    echo "No good alias found."
+    else
+        echo "No good alias found."
+        echo "Output of suggest_cmd: $suggested_alias_cmd"
     fi
 }
 

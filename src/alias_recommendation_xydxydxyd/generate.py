@@ -16,7 +16,13 @@ def get_head_freqs(history_commands, min_head_len=4):
     head_map = {}
 
     for command in history_commands:
-        words = shlex.split(command)
+        words = []
+        try:
+            words = shlex.split(command)
+        except ValueError:
+            logger.debug(f"Skipping command {command} because it is invalid")
+            continue
+        logger.debug(f"Processing command {words}")
         for i in range(1, len(words) + 1):
             head = shlex.join(words[:i])
             logger.debug(f"Processing head {head}")

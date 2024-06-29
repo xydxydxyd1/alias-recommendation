@@ -7,7 +7,8 @@ import pprint
 
 logger = logging.getLogger(__name__)
 
-MIN_RATING=100
+MIN_RATING = 100
+
 
 def parse_arguments():
     """Parse inputs for the suggest_real_time.py script.
@@ -42,6 +43,7 @@ def find_best_alias(head_ratings, existing_aliases, alias_len):
         head_ratings: dict -- The ratings of the heads
         existing_aliases: tuple(set, set) -- The existing aliases' key and value
     """
+    logger.debug(f"Got existing aliases {existing_aliases}")
     best_heads = sorted(
         head_ratings, key=lambda x: head_ratings[x], reverse=True)
     for head in best_heads:
@@ -64,13 +66,18 @@ def recommend_alias(history, existing_aliases, alias_len, min_rating, ignored_cm
     if best_alias is None or best_alias[2] < min_rating:
         logger.info("No good alias found")
         return None
+    logger.info(f"Recommending alias: {best_alias}")
+
+    # Escape best alias
+    best_alias = (best_alias[0], best_alias[1].replace("'", "\\'"))
 
     # Format output
-    return f"alias {best_alias[0]}='{best_alias[1]}'"
+    return f"alias {best_alias[0]}=$'{best_alias[1]}'"
 
 
 if __name__ == "__main__":
-    logging.basicConfig(filename="suggest_real_time.log", level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG,
+                        filename='suggest_real_time.log', filemode='w')
 
     logger.info("Parsing arguments")
     history, existing_aliases, alias_len, ignored_cmds = parse_arguments()

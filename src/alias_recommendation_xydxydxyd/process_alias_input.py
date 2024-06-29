@@ -31,6 +31,8 @@ def process_alias_input(aliases):
             logger.warn(f"Could not parse alias: {alias}")
 
     logger.info(f"Found {len(alias_names)} aliases")
+    logger.debug(f"Aliases found: {alias_names}")
+    logger.debug(f"Corresponding to: {alias_vals}")
     return alias_names, alias_vals
 
 #if __name__ == "__main__":
