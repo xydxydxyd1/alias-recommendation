@@ -29,7 +29,7 @@ def process_alias_input(aliases):
             alias_vals.add(match.group(2))
         else:
             logger.warn(f"Could not parse alias: {alias}")
-
+    
     logger.info(f"Found {len(alias_names)} aliases")
     logger.debug(f"Aliases found: {alias_names}")
     logger.debug(f"Corresponding to: {alias_vals}")

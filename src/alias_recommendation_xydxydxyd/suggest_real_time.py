@@ -54,7 +54,8 @@ def find_best_alias(head_ratings, existing_aliases, alias_len):
         if alias in existing_aliases[0]:
             logging.info(f"Alias {alias} already exists. Generating a new one")
             alias = generate_alias(head, alias_len + 1)
-        return (alias, head, head_ratings[head])
+        escaped_head = head.replace("'", "\\'") # Escape alias
+        return (alias, escaped_head, head_ratings[head])
     return None
 
 
