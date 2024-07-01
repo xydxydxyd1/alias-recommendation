@@ -1,7 +1,7 @@
 # See if there is any highly-rated alias. If yes, print out the suggestion
 import argparse
 from generate import generate_alias, get_head_freqs, rate_heads
-from process_alias_input import process_alias_input
+from process_alias_command import get_current_aliases
 import logging
 import pprint
 
@@ -19,8 +19,10 @@ def parse_arguments():
         description='See if there is any highly-rated alias. If yes, suggest it real time.')
     parser.add_argument('history', type=str,
                         help='The history of commands considered for alias')
-    parser.add_argument('existing_aliases', type=str,
-                        help='The output of the `alias` command.')
+    parser.add_argument('existing_aliases_keys', type=str,
+                        help='Newline separated')
+    parser.add_argument('existing_aliases_vals', type=str,
+                        help='Newline separated')
     parser.add_argument('--ignored_cmds', type=str, default="",
                         help='A newline-delimited list of all commands to never make aliases for.')
     parser.add_argument('--alias_len', type=int, default=3)
@@ -28,8 +30,6 @@ def parse_arguments():
     args = parser.parse_args()
     logger.info(f"Ran with history of length {len(args.history)}")
     logger.info(f"Ran with alias length {args.alias_len}")
-    logger.info(f"Ran with existing aliases of length {
-                len(args.existing_aliases)}")
     logger.info(f"Ran with ignored commands of length {
                 len(args.ignored_cmds)}")
     return args
@@ -54,8 +54,7 @@ def find_best_alias(head_ratings, existing_aliases, alias_len):
         if alias in existing_aliases[0]:
             logging.info(f"Alias {alias} already exists. Generating a new one")
             alias = generate_alias(head, alias_len + 1)
-        escaped_head = head.replace("'", "\\'") # Escape alias
-        return (alias, escaped_head, head_ratings[head])
+        return (alias, head, head_ratings[head])
     return None
 
 
@@ -68,8 +67,7 @@ def recommend_alias(history, existing_aliases, alias_len, min_rating, ignored_cm
         return None
     logger.info(f"Recommending alias: {best_alias}")
 
-    # Format output
-    return f"alias {best_alias[0]}=$'{best_alias[1]}'"
+    return best_alias
 
 
 if __name__ == "__main__":
@@ -77,7 +75,8 @@ if __name__ == "__main__":
 
     logger.info("Parsing arguments")
     args = parse_arguments()
-    args.existing_aliases = process_alias_input(args.existing_aliases)
+    existing_aliases = get_current_aliases(args.existing_aliases_keys,
+                                                args.existing_aliases_vals)
     args.history = args.history.split("\n")
     args.ignored_cmds = args.ignored_cmds.split("\\n")
     args.ignored_cmds = set(args.ignored_cmds)
@@ -86,11 +85,11 @@ if __name__ == "__main__":
     logger.debug("ARGUMENTS:")
     logger.debug(f"Ignored commands: {pprint.pformat(args.ignored_cmds)}")
     logger.debug(f"History: {pprint.pformat(args.history)}")
-    logger.debug(f"Existing aliases: {pprint.pformat(args.existing_aliases)}")
+    logger.debug(f"Existing aliases: {pprint.pformat(existing_aliases)}")
     logger.debug(f"Alias length: {args.alias_len}")
 
     logger.info("Recommending alias")
-    recommended_alias = recommend_alias(args.history, args.existing_aliases,
+    recommended_alias = recommend_alias(args.history, existing_aliases,
                                         args.alias_len, args.min_rating,
                                         args.ignored_cmds)
     print(recommended_alias)
