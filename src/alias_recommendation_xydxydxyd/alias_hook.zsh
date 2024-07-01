@@ -10,7 +10,7 @@ get_alias_keys() {
     for k in "${(@k)aliases}"; do
         alias_keys="$alias_keys\n$k"
     done
-    echo $alias_keys
+    echo "$alias_keys"
 }
 
 
@@ -20,7 +20,6 @@ get_alias_vals() {
         alias_vals="$alias_vals\n${aliases[$k]}"
     done
     echo "$alias_vals"
-    echo $alias_vals
 }
 
 
@@ -47,5 +46,5 @@ suggest_alias() {
 }
 
 # Add function to ZSH hook
-#autoload -U add-zsh-hook
-#add-zsh-hook preexec suggest_alias
+autoload -U add-zsh-hook
+add-zsh-hook preexec suggest_alias
