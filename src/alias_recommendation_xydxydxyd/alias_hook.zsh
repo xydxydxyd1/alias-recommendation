@@ -1,10 +1,5 @@
 # preexec ZSH hook for suggesting aliases
 
-rm ./suggest_real_time.log
-
-local input_matcher="(^[^=]+)=(.+)$"
-
-
 get_alias_keys() {
     alias_keys=""
     for k in "${(@k)aliases}"; do
@@ -23,6 +18,7 @@ get_alias_vals() {
 }
 
 
+# Hook function to suggest alias
 suggest_alias() {
     local suggest_cmd='python3 ./suggest_real_time.py "$(history "-10" | cut -c 8-)" "$(get_alias_keys)" "$(get_alias_vals)" --ignored_cmds "$IGNORED_ALIAS" --min_rating 25'
     local suggested_alias_cmd=$(eval $suggest_cmd)
@@ -39,9 +35,9 @@ suggest_alias() {
         fi
         echo "Creating $suggested_alias_cmd"
         eval $suggested_alias_cmd
-    else
-        echo "No good alias found."
-        echo "Output of suggest_cmd: $suggested_alias_cmd"
+    #else
+    #    echo "No good alias found."
+    #    echo "Output of suggest_cmd: $suggested_alias_cmd"
     fi
 }
 

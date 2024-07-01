@@ -1,9 +1,6 @@
+# Functions for finding good aliases
 import re
-import pprint
 import logging
-from get_history import get_history
-import argparse
-import shlex
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +38,8 @@ def get_head_freqs(history_commands, min_head_len=4):
     return head_map
 
 
-def rate_heads(head_freqs, alias_len=4, ignored_cmds=None):
+# Handles ignored_heads since to avoid some costs later on
+def rate_heads(head_freqs, alias_len=4, ignored_heads=None):
     """Rate heads based on frequency*length
 
     This is the rating used for suggesting aliases: Longer heads and more
@@ -50,12 +48,12 @@ def rate_heads(head_freqs, alias_len=4, ignored_cmds=None):
 
     Returns a map of heads to their ratings
     """
-    logger.debug(f"rate_heads: Ignored commands: {ignored_cmds}")
+    logger.debug(f"rate_heads: Ignored commands: {ignored_heads}")
     head_rating = {}
 
     for head, freq in head_freqs.items():
         logger.debug(f"Rating head {head}")
-        if ignored_cmds and head in ignored_cmds:
+        if ignored_heads and head in ignored_heads:
             logger.debug(f"Skipping head {head} because it is in ignored_cmds")
             continue
         # The -2 is to give a penalty to longer but infrequent heads
@@ -91,50 +89,37 @@ def generate_alias(command, alias_len=4):
     return "".join(word_heads)
 
 
-def get_highest_rated_heads(head_ratings, num_heads=5):
-    """Get the highest rated heads in head_ratings"""
+def find_best_alias(head_ratings, existing_aliases, alias_len):
+    """Find the best alias from head_ratings that is not in existing_aliases
+
+    Args:
+        head_ratings: dict -- The ratings of the heads
+        existing_aliases: tuple(set, set) -- The existing aliases' key and value
+    """
+    logger.debug(f"find_best_alias: Got existing aliases {existing_aliases}")
     best_heads = sorted(
         head_ratings, key=lambda x: head_ratings[x], reverse=True)
-    return best_heads[:num_heads]
+    for head in best_heads:
+        if head in existing_aliases[1]:
+            logger.info(f"Head {head} already has an alias. Skipping it")
+            continue
+        alias = generate_alias(head, alias_len)
+        logger.debug(f"Generated alias {alias} for head {head}")
+        if alias in existing_aliases[0]:
+            logging.info(f"Alias {alias} already exists. Generating a new one")
+            alias = generate_alias(head, alias_len + 1)
+        return (alias, head, head_ratings[head])
+    return None
 
 
-def get_best_aliases(history_commands, num_aliases=5, alias_len=4):
-    """Get a map of all commands and their suggested aliases
+# Top level function for recommending an alias
+def recommend_alias(history, existing_aliases, alias_len, min_rating, ignored_cmds):
+    """Recommend a a good alias. Returns None if no good alias are found"""
+    head_ratings = rate_heads(get_head_freqs(history), alias_len, ignored_cmds)
+    best_alias = find_best_alias(head_ratings, existing_aliases, alias_len)
+    if best_alias is None or best_alias[2] < min_rating:
+        logger.info("No good alias found")
+        return None
+    logger.info(f"Recommending alias: {best_alias}")
 
-    alias_len -- the length of the generated alias. If one cannot be generated,
-    command is returned without whitespace.
-    """
-    logger.info("Getting head frequencies")
-    head_map = get_head_freqs(history_commands)
-    logger.info("Rating heads")
-    head_rating = rate_heads(head_map, alias_len)
-    logger.info("Sorting heads by rating")
-    best_heads = sorted(
-        head_rating, key=lambda x: head_rating[x], reverse=True)
-    logger.info("Generating aliases")
-    aliases = {}
-    for command in best_heads:
-        if len(aliases) >= num_aliases:
-            break
-        alias = generate_alias(command, alias_len)
-        aliases[command] = alias
-    return aliases
-
-if __name__ == "__main__":
-    # Get arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--num_aliases", type=int, default=5)
-    parser.add_argument("--alias_len", type=int, default=2)
-    args = parser.parse_args()
-
-    logger.info("Getting history commands")
-    history_commands = get_history()
-
-    aliases = get_best_aliases(history_commands, args.num_aliases,
-                               args.alias_len)
-    pprint.pprint(aliases)
-
-    # head_map = get_head_freqs(history_commands)
-    # head_rating = rate_heads(head_map)
-    # best_heads = get_highest_rated_heads(head_rating)
-    # pprint.pprint(best_heads)
+    return best_alias
