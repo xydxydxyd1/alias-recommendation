@@ -28,6 +28,11 @@ def get_current_aliases(alias_keys, alias_vals):
     return alias_keys, alias_vals
 
 
+def generate_alias_cmd(alias_name, alias_val):
+    alias_val = alias_val.replace("'", "\\'")
+    return f"alias {alias_name}=$'{alias_val}'"
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Get the current aliases in use")

@@ -1,7 +1,7 @@
 # See if there is any highly-rated alias. If yes, print out the suggestion
 import argparse
 from generate import generate_alias, get_head_freqs, rate_heads
-from process_alias_command import get_current_aliases
+from process_alias_command import get_current_aliases, generate_alias_cmd
 import logging
 import pprint
 
@@ -92,4 +92,12 @@ if __name__ == "__main__":
     recommended_alias = recommend_alias(args.history, existing_aliases,
                                         args.alias_len, args.min_rating,
                                         args.ignored_cmds)
+
+    # Output
+    if recommended_alias is None:
+        logger.info("No good alias found")
+        exit(0)
+    recommended_alias = generate_alias_cmd(recommended_alias[0],
+                                           recommended_alias[1])
+    logger.info(f"Recommended alias: {recommended_alias}")
     print(recommended_alias)
