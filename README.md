@@ -17,3 +17,9 @@ For one-time recommendations:
 For constant recommendations:
 * `src/alias_hook.zsh` - contains a function that suggests an alias based on
   past history
+
+# Next steps
+* Refine ignore system since right now, it may continue to (annoyingly)
+  recommend shorter versions of ignored commands.
+* Install and setup scripts
+* Allow for editting of aliases before execution (kind of like git commit)
