@@ -64,4 +64,5 @@ if __name__ == "__main__":
         logger.info("No good alias found")
         exit(0)
     logger.info(f"Recommended alias: {recommended_alias}")
-    print(recommended_alias)
+    # Output in newline format for ZSH parsing
+    print(f"{recommended_alias[0]}\n{recommended_alias[1]}")
