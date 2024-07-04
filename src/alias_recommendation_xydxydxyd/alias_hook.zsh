@@ -1,9 +1,12 @@
 # preexec ZSH hook for suggesting aliases
 
+script_dir=${0:a:h}
+
+
 get_alias_keys() {
     local alias_keys=""
     for k in "${(@k)aliases}"; do
-        local alias_keys="$alias_keys\n$k"
+        alias_keys="$alias_keys\n$k"
     done
     echo "$alias_keys"
 }
@@ -12,7 +15,7 @@ get_alias_keys() {
 get_alias_vals() {
     local alias_vals=""
     for k in "${(@k)aliases}"; do
-        local alias_vals="$alias_vals\n${aliases[$k]}"
+        alias_vals="$alias_vals\n${aliases[$k]}"
     done
     echo "$alias_vals"
 }
@@ -26,7 +29,12 @@ escape_alias() {
 
 # Hook function to suggest alias
 suggest_alias() {
-    local suggest_cmd='suggest_real_time.py "$(history "-10" | cut -c 8-)" "$(get_alias_keys)" "$(get_alias_vals)" --ignored_cmds "$IGNORED_ALIAS" --min_rating 25'
+    local suggest_cmd="$script_dir/suggest_real_time.py"
+    suggest_cmd+=' "$(history "-10" | cut -c 8-)"'
+    suggest_cmd+=' "$(get_alias_keys)"'
+    suggest_cmd+=' "$(get_alias_vals)"'
+    suggest_cmd+=' --ignored_cmds "$IGNORED_ALIAS"'
+    suggest_cmd+=' --min_rating 25'
     local py_output="$(eval $suggest_cmd)"
     local output_matcher="^alias ([a-zA-Z0-9_]+)=\\$'(.*)'$"
     if [[ -n "$py_output" ]]; then
