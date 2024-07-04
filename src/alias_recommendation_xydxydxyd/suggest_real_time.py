@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # See if there is any highly-rated alias. If yes, print out the suggestion
 import argparse
 from generate import recommend_alias
@@ -62,7 +63,5 @@ if __name__ == "__main__":
     if recommended_alias is None:
         logger.info("No good alias found")
         exit(0)
-    recommended_alias = generate_alias_cmd(recommended_alias[0],
-                                           recommended_alias[1])
     logger.info(f"Recommended alias: {recommended_alias}")
     print(recommended_alias)

@@ -20,7 +20,7 @@ get_alias_vals() {
 
 # Hook function to suggest alias
 suggest_alias() {
-    local suggest_cmd='python3 ./suggest_real_time.py "$(history "-10" | cut -c 8-)" "$(get_alias_keys)" "$(get_alias_vals)" --ignored_cmds "$IGNORED_ALIAS" --min_rating 25'
+    local suggest_cmd='suggest_real_time.py "$(history "-10" | cut -c 8-)" "$(get_alias_keys)" "$(get_alias_vals)" --ignored_cmds "$IGNORED_ALIAS" --min_rating 25'
     local suggested_alias_cmd=$(eval $suggest_cmd)
     local output_matcher="^alias ([a-zA-Z0-9_]+)=\\$'(.*)'$"
     if [[ "$suggested_alias_cmd" =~ $output_matcher ]]; then
@@ -35,9 +35,9 @@ suggest_alias() {
         fi
         echo "Creating $suggested_alias_cmd"
         eval $suggested_alias_cmd
-    #else
-    #    echo "No good alias found."
-    #    echo "Output of suggest_cmd: $suggested_alias_cmd"
+    else
+        echo "No good alias found."
+        echo "Output of suggest_cmd: $suggested_alias_cmd"
     fi
 }
 
