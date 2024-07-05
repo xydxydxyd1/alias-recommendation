@@ -1,3 +1,6 @@
+# Setup
+Run `src/install.zsh`
+
 # Alias Recommendation
 
 Uses saved history of commands to recommend aliases for frequently used
